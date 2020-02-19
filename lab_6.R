@@ -11,14 +11,6 @@ summary(model.log)
 exp(coef(model.log)[2])
 
 # every increase 1 mm you are 2.35 more likely to survive 
-
-# getting the percent increase
-prob <- function(beta0, beta1){
-	y <- exp(beta0 + beta1)/ (1 + exp(beta0 + beta1))
-	return(y)
-}
-
-plot(x, prob((exp(coef(model.log)[1])), (exp(coef(model.log)[2])))
 # Binomial regression ####
 load("chupacabra_binomial-1.RData")
 jagsdata
@@ -58,7 +50,7 @@ model.pois <- glm(y ~x, family = poisson)
 summary(model.pois)
 
 exp(coef(model.pois)[2])
-# 17% increase in the number of birds per increase in hectare patch size
+# 17% increase in the number of birds per 1/2 ha increase in patch size
 # can not extrapolate past your data (there is a limit to the number of birds)
 
 plot(x,y,xlab="Patch size (ha)",ylab="Number of bird species")
@@ -89,4 +81,4 @@ pmod <- jags(model.file = model.pois.2, data = p_data, n.iter = 10000,
 pmod 
 traceplot(pmod)
 
-
+exp(0.159)
