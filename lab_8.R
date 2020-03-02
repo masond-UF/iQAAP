@@ -121,11 +121,25 @@ x <- data.frame("Event" = 1:13, "Observations" = c(16, 24, 14, 23, 21, 16,
 																									 20, 10, 21, 23, 23, 23, 0))
 
 ggplot(data = x, aes(x = Event, y = Observations))+
-	geom_point()+
+	geom_point(size = 6)+
 	geom_line()+
 	scale_x_continuous(breaks = 1:13)+
-	theme_classic()
-	
-
+	ggtitle("Captures per time step")+
+	theme_classic(base_size = 20)+
+	theme(plot.title = element_text(hjust = 0.5))
 # Assignment 2 ####
+anolis <- read.csv("anolis_gundlachi_p1_ch.csv")
+models_anolis <- closedp.t(anolis[,2:8])
+models_anolis 
+# change of behavior with marking (Mb)?
+# change of capture with individuals (Mh)? 
+# change of capture with time series (Mt)?
+# lowest AIC (no warning) incorporates time and individual heterogeniety
+# lowest BIC (no warning) incorporates individual heterogeniety
+# evidence that individual heterogeniety matters more, but temporal
+# heterogenity also matters. No evidence that marking matters.
 
+anolis_darroch_estimates <- closedpCI.t(anolis[,2:8],
+																 m = "Mth", h = "Darroch")
+plotCI(anolis_darroch_estimates) #plot likelihood profile
+# CI lower = 48.53, higher = 200.91, mean = 87.81
