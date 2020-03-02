@@ -33,7 +33,86 @@ darroch_estimates <- closedpCI.t(ornate_lizard_u1_ind[,2:14],
 																 m = "Mth", h = "Darroch")
 plotCI(darroch_estimates)
 # Bayesian parameterization ####
+# data augmentation
+oldata <- ornate_lizard_u1_ind[,2:14] # for rbinding we need the same col names
+T <- ncol(oldata) # nunmber of columns
+colnames(oldata) <- 1:T # name the columns
 
+nz <- 1000 # add 1000 capture histories with just zero
+zdata <- data.frame(array(0, dim = c(nz,T)))
+colnames(zdata) <- 1:T
+yaug <- rbind(oldata, zdata)
+
+head(yaug)
+tail(yaug)
+
+library(rjags)
+library(R2jags)
+
+model0 <- function(){
+	# Priors
+	omega~dunif(0,1)
+	p~dunif(0,1)
+	
+	# Likelihood
+	for (i in 1:M){
+		z[i]~dbern(omega)
+		for (j in 1:T){
+			yaug[i,j]~dbern(p.eff[i,j])
+			p.eff[i,j] <- z[i]*p
+		}
+	}
+	# Derived quantities
+	N <- sum(z[])
+}
+
+# format data
+data <- list(yaug = yaug, M = nrow(yaug), T=ncol(yaug))
+# parameters
+params <- c("N", "p", "omega")
+# initial values for MCMC
+inits <- function(){
+	list(z = rep(1,nrow(yaug)), p = runif(0,1))
+}
+# run the model
+jags.m0 <- jags(model.file = model0, data = data, inits = inits, params,
+								n.iter = 2500, n.chains = 3)
+
+# see model output
+traceplot(jags.m0)
+plot(jags.m0)
+
+# temporal heterogeniety
+
+modelt <- function(){
+	# Priors
+	omega~dunif(0,1)
+	for (i in 1:T){
+	p[i]~dunif(0,1)
+	}
+	# Likelihood
+	for (i in 1:M){
+		z[i]~dbern(omega)
+		for (j in 1:T){
+			yaug[i,j]~dbern(p.eff[i,j])
+			p.eff[i,j] <- z[i]*p[j]
+		}
+	}
+	# Derived quantities
+	N <- sum(z[])
+}
+
+#format data
+data<-list(yaug=yaug,M=nrow(yaug),T=ncol(yaug)) #parameters
+params<-c("N","p","omega")
+#initial values for MCMC
+inits<-function() list(z=rep(1,nrow(yaug)),p=runif(T,0,1))
+#run the model
+jags.mt=jags(model.file=modelt,data=data,inits=inits,params,n.iter=2500,n.chains=3)
+traceplot(jags.mt)
+plot(jags.mt)
+
+jags.mt
 
 # Assignment 1 ####
 # Assignment 2 ####
