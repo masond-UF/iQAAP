@@ -115,5 +115,17 @@ plot(jags.mt)
 jags.mt
 
 # Assignment 1 ####
+library(ggplot2)
+colSums(ornate_lizard_u1_ind)
+x <- data.frame("Event" = 1:13, "Observations" = c(16, 24, 14, 23, 21, 16,
+																									 20, 10, 21, 23, 23, 23, 0))
+
+ggplot(data = x, aes(x = Event, y = Observations))+
+	geom_point()+
+	geom_line()+
+	scale_x_continuous(breaks = 1:13)+
+	theme_classic()
+	
+
 # Assignment 2 ####
 
