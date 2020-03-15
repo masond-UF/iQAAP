@@ -144,6 +144,5 @@ inits <- function(){list(z = cjs.init.z(jags.data$y, jags.data$f),
 m.0 <- jagsUI(data = jags.data, inits, parameters.to.save = params,
 							model.file = "cjs0.txt", n.thin = 5, n.chains = 3,
 							n.burnin = 10000, n.iter =20000, parallel = TRUE)
-m.0$summary
-
+summary(m.0)
 	
