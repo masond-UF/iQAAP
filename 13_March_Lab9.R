@@ -63,6 +63,104 @@ dipper.table
 dipper.phidot.pdot$results
 dipper.phisex.pdot$results
 # Assignment 1—Try this with the snail kite data ####
+rm(list=ls()) 
+s.convert <- convert.inp("SnailKite.inp",
+												 group.df=data.frame(habitat=c("NP","AF")))
+
+qd <- mark(s.convert)
+qd$results$real
+
+kite.proc <- process.data(s.convert, groups = c("habitat"), 
+														model = "CJS")
+kite.ddl <- make.design.data(kite.proc) 
+kite.ddl 
+
+# Phi
+Phidot <- list(formula = ~1)
+Phitime <- list(formula = ~time)
+Phihab <- list(formula = ~habitat)
+Phihabtime <- list(formula = ~habitat + time)
+Phihab.time <- list(formula = ~habitat * time)
+
+#p
+pdot <- list(formula = ~1)
+ptime <- list(formula = ~Time)
+phab <- list(formula = ~habitat)
+phabtime <- list(formula = ~habitat + time)
+phab.time <- list(formula = ~habitat * time)
+
+# φ(.), p(.)
+kite.phidot.pdot<-mark(kite.proc,kite.ddl,
+											 model.parameters=list(Phi=Phidot,p=pdot))
+# φ(time), p(time)
+kite.phitime.ptime<-mark(kite.proc,kite.ddl,
+												 model.parameters=list(Phi=Phitime,p=ptime))
+# φ(time), p(.)
+kite.phitime.pdot <- mark(kite.proc, kite.ddl,
+													 model.parameters = list(Phi = Phitime, p = pdot))
+# φ(time), p(hab)
+kite.phitime.phab <- mark(kite.proc, kite.ddl,
+														 model.parameters = list(Phi = Phitime, p = phab))
+# φ(time), p(hab ∗ time)
+kite.phitime.phab.time <- mark(kite.proc, kite.ddl,
+														model.parameters = list(Phi = Phitime, p = phab.time))
+# φ(hab), p(.)
+kite.phihab.pdot <- mark(kite.proc, kite.ddl,
+													 model.parameters = list(Phi = Phihab, p = pdot))
+# φ(hab), p(hab)
+kite.phihab.phab <- mark(kite.proc, kite.ddl,
+													 model.parameters = list(Phi = Phihab, p = phab))
+# φ(hab*time), p(hab)
+kite.phihab.time.phab <- mark(kite.proc, kite.ddl,
+																 model.parameters = list(Phi = Phihab.time, p = phab))
+# φ(hab), p(time)
+kite.phihab.ptime <- mark(kite.proc, kite.ddl,
+														model.parameters = list(Phi = Phihab, p = ptime))
+
+# φ(hab*time), p(hab*time)
+kite.phihab.time.phab.time <- mark(kite.proc, kite.ddl,
+															model.parameters = list(Phi = Phihab.time, p = phab.time))
+
+kite.table <- collect.models(type = "CJS")
+kite.table
+str(kite.table)
+
+df <- as.data.frame(kite.phihab.time.phab.time$results$real)
+df <- df[,1:4]
+df$time <- c(1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,
+						 2,3,4,5,6,7,8,9,10,2,3,4,5,6,7,8,9,10)
+df$Habitat <- c("AF","AF","AF","AF","AF","AF","AF","AF","AF",
+								"NP","NP","NP","NP","NP","NP","NP","NP","NP",
+								"AF","AF","AF","AF","AF","AF","AF","AF","AF",
+								"NP","NP","NP","NP","NP","NP","NP","NP","NP")
+df.phi <- df[1:18,]
+df.phi <- df.phi[-c(9,18),]
+df.p <- df[19:36,]
+df.p <- df.p[-c(9,18),]
+
+# Phi estimates [got wonky values for the ninth time]
+ggplot(data = df.phi, aes(x = time, y = estimate, color = Habitat))+
+	geom_line()+
+	geom_point(size = 4)+
+	scale_color_manual(values=c("#E69F00", "#56B4E9"))+
+	scale_x_continuous("Time", breaks = c(1,2,3,4,5,6,7,8))+
+	scale_y_continuous("φ Estimate", breaks = c(0.4,0.5,0.6,0.7,0.8,0.9))+
+	ggtitle("Snail Kite Survival")+
+	geom_errorbar(aes(ymin=estimate-se, ymax=estimate+se), width=.3)+
+	theme_classic(base_size = 15)
+
+# p estimates
+ggplot(data = df.p, aes(x = time, y = estimate, color = Habitat))+
+	geom_line()+
+	geom_point(size = 4)+
+	scale_color_manual(values=c("#E69F00", "#56B4E9"))+
+	scale_x_continuous("Time", breaks = c(1,2,3,4,5,6,7,8,9))+
+	scale_y_continuous("p Estimate", breaks = c(0.1,0.2,0.3,0.4,0.5,
+																							0.6,0.7,0.8))+
+	ggtitle("Snail Kite Detection")+
+	geom_errorbar(aes(ymin=estimate-se, ymax=estimate+se), width=.3)+
+	theme_classic(base_size = 15)
+
 # Bayesian CJS ####
 load("ch_simulated.RData")
 known.states.cjs <- function(ch){
