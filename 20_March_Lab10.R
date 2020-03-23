@@ -115,6 +115,7 @@ GammaDoublePrime.dot = list(formula = ~1) #markovian
 #gamma fixed to zero for no TE
 GammaDoublePrime.zero = list(formula = ~ 1, fixed = 0)
 GammaPrime.zero = list(formula = ~ 1, fixed = 0)
+GammaPrime.dot=list(formula=~1) 
 #######"Null" model, no TE 
 model.0=mark(data = rd, model = "Robust", time.intervals=time.intervals, 
 						 model.parameters=list(S=S.dot, GammaPrime=GammaPrime.zero,
@@ -124,8 +125,48 @@ model.0$results$real
 model.1 <- mark(data = rd, model = "Robust", time.intervals = time.intevals,
 						 model.parameters = list(S=S.time, GammaPrime=GammaPrime.zero,
 						 GammaDoublePrime=GammaDoublePrime.zero, p=p.dot),threads=2)
+model.1$results$real
+model.1$parameters
 # time and p(session)
-model.2 
+model.2 <- mark(data = rd, model = "Robust", time.intervals = time.intevals,
+					 model.parameters = list(S=S.time, GammaPrime=GammaPrime.zero,
+					 GammaDoublePrime=GammaDoublePrime.zero, p=p.session),threads=2)
+model.2$results$real # 16
 # time, p(session), and markov emigration
-model.3 
-model.4 # time, p(session), and random emigration
+model.3 <- mark(data = rd, model = "Robust", time.intervals = time.intevals,
+								model.parameters = list(S=S.time, GammaPrime=GammaPrime.dot,
+								GammaDoublePrime=GammaDoublePrime.dot, p=p.session),threads=2)
+model.3$results$real
+# time, p(session), and random emigration
+model.4 <- mark(data = rd, model = "Robust", time.intervals = time.intevals,
+								model.parameters = list(S=S.time, GammaPrime=GammaPrime.dot,
+								GammaDoublePrime=GammaDoublePrime.random, p=p.session),threads=2)
+collect.models()
+# markov emigration best describes this system, but i went with the 
+
+# Make figures for model 3 (which is the fourth model because we started at zero)
+df <- as.data.frame(model.4$results$real)
+
+# abundance through time
+abundance <- df[18:22,1:4]
+abundance$session <- as.factor(c(1,2,3,4,5))
+
+ggplot(data = abundance, aes(x = session, y = estimate))+
+	geom_point(size = 4)+
+	scale_x_discrete("Time", breaks = c(1,2,3,4))+
+	ylab("Abundance")+
+	geom_errorbar(aes(ymin=lcl, ymax=ucl), width=.3)+
+	theme_classic(base_size = 15)
+
+
+# gamma double prime through time
+gamma.dbl.prime <- as.data.frame(df[5:8,1:4])
+gamma.dbl.prime$time <- as.factor(c(1,2,3,4))
+
+ggplot(data = gamma.dbl.prime, aes(x = time, y = estimate))+
+	geom_point(size = 4)+
+	scale_x_discrete("Time", breaks = c(1,2,3,4))+
+	ylab("Temporary Emigration")+
+	geom_errorbar(aes(ymin=lcl, ymax=ucl), width=.3)+
+	theme_classic(base_size = 15)
+
