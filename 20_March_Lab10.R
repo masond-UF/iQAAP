@@ -36,6 +36,7 @@ model.1$results$real[,1:4]
 model.2 <- mark(data = robust, model = "RDHet", time.intervals=time.intervals,
 						 model.parameters=list(S=S.time, 
 						 GammaDoublePrime=GammaDoublePrime.random, p=p.dot),threads=2)
+model.2$results$real
 GammaPrime.dot=list(formula=~1) 
 model.3=mark(data = robust, model = "RDHet",
 						 time.intervals=time.intervals, 
@@ -49,9 +50,22 @@ model.4=mark(data = robust, model = "RDFullHet", time.intervals=time.intervals,
 model.4$results$real
 collect.models()
 # Assignment 1—Plot the model results ####
-model.3=mark(data = robust, model = "RDHet",
-						 time.intervals=time.intervals, 
-						 model.parameters=list(S=S.dot, GammaPrime=GammaPrime.dot, 
-						 											GammaDoublePrime=GammaDoublePrime.dot, p=p.dot),threads=2)
-df <- as.data.frame(model.3$results$real)
+model.2 <- mark(data = robust, model = "RDHet", time.intervals=time.intervals,
+								model.parameters=list(S=S.time, 
+																			GammaDoublePrime=GammaDoublePrime.random, p=p.dot),threads=2)
+
+df <- as.data.frame(model.1$results$real) # pull the results
+
+# make S dataframe and plot
+S <- df[1:4,1:4] 
+S$time <- as.factor(c(1,2,3,4))
+
+# make gamma double prime dataframe and plot
+g.dbl.prime <- df[5:8,1:4]
+g.dbl.prime$time <- as.factor(c(1,2,3,4))
+
+# make p dataframe and plot
+p <- df[9:23,1:4]
+p$session <- as.factor(c(1,1,2,2,3,3,3,3,4,4,4,4,4,5,5))
+p$time <- as.factor(c(1,2,1,2,1,2,3,4,1,2,3,4,5,1,2))
 # ASsignment 2 ####
