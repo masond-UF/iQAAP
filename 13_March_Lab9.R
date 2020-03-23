@@ -1,5 +1,6 @@
 # 13 March 2020—Lab 9: Survival analysis using CJS ####
 library('RMark')
+library("ggplot2")
 # Basics ####
 data(dipper)
 head(dipper)
