@@ -48,5 +48,10 @@ model.4=mark(data = robust, model = "RDFullHet", time.intervals=time.intervals,
 						 GammaDoublePrime=GammaDoublePrime.dot, p=pc),threads=2)
 model.4$results$real
 collect.models()
-# Assignment 1 ####
+# Assignment 1—Plot the model results ####
+model.3=mark(data = robust, model = "RDHet",
+						 time.intervals=time.intervals, 
+						 model.parameters=list(S=S.dot, GammaPrime=GammaPrime.dot, 
+						 											GammaDoublePrime=GammaDoublePrime.dot, p=p.dot),threads=2)
+df <- as.data.frame(model.3$results$real)
 # ASsignment 2 ####
