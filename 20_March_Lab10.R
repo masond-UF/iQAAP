@@ -98,4 +98,34 @@ ggplot(data = p, aes(x = time, y = estimate, group = session, color = session))+
 	ggtitle("Apparent probability of encounter")+
 	theme_classic(base_size = 15)
 
-# ASsignment 2 ####
+# Assignment 2 ####
+rm(list=ls()) #WARNING! This will delete your workspace #But is needed to use collect.models() in the end
+rd.inp <- convert.inp("assignment_rd.inp")
+time.intervals <- c(0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0)
+rd <- process.data(data = rd.inp,
+									 model = "Robust",
+									 time.intervals = time.intervals)
+#Define models
+S.time = list(formula = ~ time)
+S.dot=list(formula=~1)
+p.dot=list(formula=~1)
+p.session = list(formula = ~ session)
+GammaDoublePrime.random = list(formula = ~time,share=TRUE) #random
+GammaDoublePrime.dot = list(formula = ~1) #markovian
+#gamma fixed to zero for no TE
+GammaDoublePrime.zero = list(formula = ~ 1, fixed = 0)
+GammaPrime.zero = list(formula = ~ 1, fixed = 0)
+#######"Null" model, no TE 
+model.0=mark(data = rd, model = "Robust", time.intervals=time.intervals, 
+						 model.parameters=list(S=S.dot, GammaPrime=GammaPrime.zero,
+						 GammaDoublePrime=GammaDoublePrime.zero, p=p.dot),threads=2)
+model.0$results$real
+# time
+model.1 <- mark(data = rd, model = "Robust", time.intervals = time.intevals,
+						 model.parameters = list(S=S.time, GammaPrime=GammaPrime.zero,
+						 GammaDoublePrime=GammaDoublePrime.zero, p=p.dot),threads=2)
+# time and p(session)
+model.2 
+# time, p(session), and markov emigration
+model.3 
+model.4 # time, p(session), and random emigration
