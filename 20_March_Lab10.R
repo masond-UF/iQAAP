@@ -1,5 +1,6 @@
 # 20 March 2020—Lab 10 ####
-library("RMark")
+library(RMark)
+library(ggplot2)
 data(robust)
 time.intervals <- c(0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0)
 # Robust Model in RMark ####
@@ -60,12 +61,41 @@ df <- as.data.frame(model.1$results$real) # pull the results
 S <- df[1:4,1:4] 
 S$time <- as.factor(c(1,2,3,4))
 
+ggplot(data = S, aes(x = time, y = estimate))+
+	geom_line()+
+	geom_point(size = 4)+
+	scale_x_discrete("Time", breaks = c(1,2,3,4))+
+	ylab("S")+
+	ggtitle("True Survival")+
+	geom_errorbar(aes(ymin=lcl, ymax=ucl), width=.3)+
+	theme_classic(base_size = 15)
+
+
 # make gamma double prime dataframe and plot
 g.dbl.prime <- df[5:8,1:4]
 g.dbl.prime$time <- as.factor(c(1,2,3,4))
+
+ggplot(data = g.dbl.prime, aes(x = time, y = estimate))+
+	geom_line()+
+	geom_point(size = 4)+
+	scale_x_discrete("Time", breaks = c(1,2,3,4))+
+	ylab("γ″")+
+	ggtitle("Emigration")+
+	geom_errorbar(aes(ymin=lcl, ymax=ucl), width=.3)+
+	theme_classic(base_size = 15)
+
 
 # make p dataframe and plot
 p <- df[9:23,1:4]
 p$session <- as.factor(c(1,1,2,2,3,3,3,3,4,4,4,4,4,5,5))
 p$time <- as.factor(c(1,2,1,2,1,2,3,4,1,2,3,4,5,1,2))
+
+ggplot(data = p, aes(x = time, y = estimate, group = session, color = session))+
+	geom_line()+
+	geom_point(size = 4)+
+	scale_x_discrete("Time", breaks = c(1,2,3,4))+
+	ylab("p")+
+	ggtitle("Apparent probability of encounter")+
+	theme_classic(base_size = 15)
+
 # ASsignment 2 ####
