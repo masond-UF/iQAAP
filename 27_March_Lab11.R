@@ -4,6 +4,7 @@ library(FSA)
 library(lubridate)
 library(ggplot2)
 # Lesson #####
+rm(list=ls())
 load("ms_data_3states.RData")
 ms.processed <- process.data(ms,model="Multistrata") 
 ms.ddl <- make.design.data(ms.processed)
