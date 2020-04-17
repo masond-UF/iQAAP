@@ -117,3 +117,36 @@ exp(coef(mod_2)[4])
 #extinction and patch area
 exp(coef(mod_2)[6])
 # Assignment 2 ####
+mod_3 <- colext(psiformula=~Phorophyte,gammaformula=~(S+A), epsilonformula=~A,
+								pformula=~A+Phorophyte,data=lepa_umf)
+mod_4 <- colext(psiformula=~Phorophyte,gammaformula=~S, epsilonformula=~(A+S),
+								pformula=~A+Phorophyte,data=lepa_umf)
+mod_5 <- colext(psiformula=~Phorophyte,gammaformula=~(S+A), epsilonformula=~(A+S),
+								pformula=~A+Phorophyte,data=lepa_umf)
+
+# list the models
+models <- fitList("mod_1" = mod_1,
+									"mod_2" = mod_2,
+									"mod_3" = mod_3,
+									"mod_4" = mod_4,
+									"mod_5" = mod_5)
+
+# which is the most parsimonious
+modSel(models)
+
+out.put <- model.sel(mod_2, mod_3, mod_4)
+MA.ests <- model.avg(out.put, subset = delta < 2)
+
+# S = patch connectivity
+# A = patch area
+
+# Colonization
+exp(coef(MA.ests)[3]) # rock?
+exp(coef(MA.ests)[3])+plogis(coef(MA.ests)[4]) # + connectivity
+exp(coef(MA.ests)[3])+exp(coef(MA.ests)[4])+exp(coef(MA.ests)[4]) # + patch area
+
+# Extinction
+exp(coef(MA.ests)[5]) # rock?
+exp(coef(MA.ests)[5])-exp(coef(MA.ests)[6]) # + area
+exp(coef(MA.ests)[5])-exp(coef(MA.ests)[6])-exp(coef(MA.ests)[11])# connectivity
+
